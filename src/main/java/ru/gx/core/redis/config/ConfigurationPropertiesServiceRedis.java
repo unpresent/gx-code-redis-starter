@@ -28,6 +28,9 @@ public class ConfigurationPropertiesServiceRedis {
         private SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
 
         @NestedConfigurationProperty
+        private BootstrapConfiguration bootstrapConfiguration = new BootstrapConfiguration();
+
+        @NestedConfigurationProperty
         private StandardLoader standardLoader = new StandardLoader();
     }
 
@@ -44,6 +47,12 @@ public class ConfigurationPropertiesServiceRedis {
     @Getter
     @Setter
     public static class SimpleConfiguration {
+        private boolean enabled = true;
+    }
+
+    @Getter
+    @Setter
+    public static class BootstrapConfiguration {
         private boolean enabled = true;
     }
 
