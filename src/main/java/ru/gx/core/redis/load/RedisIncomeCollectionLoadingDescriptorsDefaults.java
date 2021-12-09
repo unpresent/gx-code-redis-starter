@@ -2,12 +2,14 @@ package ru.gx.core.redis.load;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import ru.gx.core.channels.AbstractChannelDescriptorsDefaults;
 import ru.gx.core.channels.ChannelMessageMode;
 import ru.gx.core.channels.IncomeChannelDescriptorsDefaults;
+import ru.gx.core.redis.IncomeCollectionSortMode;
 
 import java.security.InvalidParameterException;
 
@@ -17,9 +19,14 @@ import java.security.InvalidParameterException;
 @ToString
 public class RedisIncomeCollectionLoadingDescriptorsDefaults extends IncomeChannelDescriptorsDefaults {
 
+    @Setter
+    @NotNull
+    private IncomeCollectionSortMode sortMode;
+
     protected RedisIncomeCollectionLoadingDescriptorsDefaults() {
         super();
         this.setMessageMode(ChannelMessageMode.Object);
+        this.sortMode = IncomeCollectionSortMode.None;
     }
 
     @Override

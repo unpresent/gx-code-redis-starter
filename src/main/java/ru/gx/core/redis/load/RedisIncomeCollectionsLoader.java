@@ -15,6 +15,7 @@ import ru.gx.core.channels.ChannelConfigurationException;
 import ru.gx.core.channels.ChannelMessageMode;
 import ru.gx.core.channels.IncomeDataProcessType;
 import ru.gx.core.events.EventsPrioritizedQueue;
+import ru.gx.core.redis.IncomeCollectionSortMode;
 
 import java.security.InvalidParameterException;
 import java.util.HashMap;
@@ -141,10 +142,25 @@ public class RedisIncomeCollectionsLoader implements ApplicationContextAware {
         var dataObjectsCount = 0; // Количество объектов в исходных данных. Для будущей статистики.
 
         if (descriptor.getMessageMode() == ChannelMessageMode.Object) {
-            for (var rec : records.values()) {
-                internalProcessRecord(descriptor, rec);
-                dataObjectsCount++;
-                eventsCount++;
+            if (descriptor.getSortMode() == IncomeCollectionSortMode.None) {
+                for (var rec : records.values()) {
+                    internalProcessRecord(descriptor, rec);
+                    dataObjectsCount++;
+                    eventsCount++;
+                }
+            } else {
+                Object[] sortedKeys;
+                if (descriptor.getSortMode() == IncomeCollectionSortMode.KeyAsc) {
+                    sortedKeys = records.keySet().stream().sorted().toArray();
+                } else {
+                    sortedKeys = records.keySet().stream().sorted((o1, o2) -> -o1.toString().compareTo(o2.toString())).toArray();
+                }
+                for (var key : sortedKeys) {
+                    final var rec = records.get(key);
+                    internalProcessRecord(descriptor, rec);
+                    dataObjectsCount++;
+                    eventsCount++;
+                }
             }
         } else /*if (descriptor.getMessageMode() == ChannelMessageMode.Package)*/ {
             throw new ChannelConfigurationException("Only ChannelMessageMode.Object supported by Redis!");

@@ -1,6 +1,8 @@
 package ru.gx.core.redis.load;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +14,7 @@ import ru.gx.core.channels.ChannelMessageMode;
 import ru.gx.core.channels.SerializeMode;
 import ru.gx.core.data.DataObject;
 import ru.gx.core.data.DataPackage;
+import ru.gx.core.redis.IncomeCollectionSortMode;
 
 import java.security.InvalidParameterException;
 
@@ -27,12 +30,21 @@ public class RedisIncomeCollectionLoadingDescriptor<O extends DataObject, P exte
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">
 
+    @NotNull
+    @Getter
+    private IncomeCollectionSortMode sortMode;
+
     // </editor-fold>
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialize">
     public RedisIncomeCollectionLoadingDescriptor(@NotNull final AbstractRedisIncomeCollectionsConfiguration owner, @NotNull final String collectionName, @Nullable final RedisIncomeCollectionLoadingDescriptorsDefaults defaults) {
         super(owner, collectionName, defaults);
+        this.sortMode = IncomeCollectionSortMode.None;
         this.setMessageMode(ChannelMessageMode.Object);
+        if (defaults != null) {
+            this
+                    .setSortMode(defaults.getSortMode());
+        }
     }
 
     /**
@@ -74,14 +86,21 @@ public class RedisIncomeCollectionLoadingDescriptor<O extends DataObject, P exte
         return this.getOwner().getBinaryRedisTemplate();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public @NotNull AbstractChannelDescriptor setMessageMode(@NotNull final ChannelMessageMode messageMode) {
+    public @NotNull RedisIncomeCollectionLoadingDescriptor<O, P> setMessageMode(@NotNull final ChannelMessageMode messageMode) {
         if (messageMode != ChannelMessageMode.Object) {
             throw new InvalidParameterException("Only ChannelMessageMode.Object supported by Redis!");
         }
-        return super.setMessageMode(messageMode);
+        return (RedisIncomeCollectionLoadingDescriptor<O, P>)super.setMessageMode(messageMode);
     }
 
+    @NotNull
+    public RedisIncomeCollectionLoadingDescriptor<O, P> setSortMode(@NotNull final IncomeCollectionSortMode sortMode) {
+        this.checkChangeable("sortMode");
+        this.sortMode = sortMode;
+        return this;
+    }
     // </editor-fold>
     // -----------------------------------------------------------------------------------------------------------------
 }
