@@ -27,6 +27,7 @@ import static lombok.AccessLevel.PUBLIC;
 /**
  * Базовая реализация загрузчика, который упрощает задачу чтения данных из очереди и десериалиазции их в объекты.
  */
+@SuppressWarnings("unused")
 @Slf4j
 public class RedisIncomeCollectionsLoader implements ApplicationContextAware {
     private final static int MAX_SLEEP_MS = 64;
@@ -77,7 +78,7 @@ public class RedisIncomeCollectionsLoader implements ApplicationContextAware {
      * @return Список загруженных объектов.
      */
     public int processByCollection(@NotNull final RedisIncomeCollectionLoadingDescriptor<?, ?> descriptor) {
-        checkDescriptorIsInitialized(descriptor);
+        checkDescriptorIsActive(descriptor);
         return internalProcessDescriptor(descriptor);
     }
 
@@ -96,14 +97,16 @@ public class RedisIncomeCollectionsLoader implements ApplicationContextAware {
             if (collectionDescriptors == null) {
                 throw new ChannelConfigurationException("Invalid null value getByPriority(" + p + ")");
             }
-            for (var collectionDescriptor : collectionDescriptors) {
-                if (collectionDescriptor instanceof final RedisIncomeCollectionLoadingDescriptor<?, ?> kafkaDescriptor) {
-                    log.debug("Loading working data from collection: {}", collectionDescriptor.getName());
-                    final var eventsCount = processByCollection(kafkaDescriptor);
-                    result.put(kafkaDescriptor, eventsCount);
-                    log.debug("Loaded working data from collection. Events: {}", kafkaDescriptor.getName());
-                } else {
-                    throw new ChannelConfigurationException("Invalid class of descriptor " + collectionDescriptor.getName());
+            for (var descriptor : collectionDescriptors) {
+                if (descriptor.isEnabled()) {
+                    if (descriptor instanceof final RedisIncomeCollectionLoadingDescriptor<?, ?> redisDescriptor) {
+                        log.debug("Loading working data from collection: {}", descriptor.getName());
+                        final var eventsCount = processByCollection(redisDescriptor);
+                        result.put(redisDescriptor, eventsCount);
+                        log.debug("Loaded working data from collection. Events: {}", redisDescriptor.getName());
+                    } else {
+                        throw new ChannelConfigurationException("Invalid class of descriptor " + descriptor.getName());
+                    }
                 }
             }
         }
@@ -119,9 +122,12 @@ public class RedisIncomeCollectionsLoader implements ApplicationContextAware {
      *
      * @param descriptor описатель, который проверяем.
      */
-    protected void checkDescriptorIsInitialized(@NotNull final RedisIncomeCollectionLoadingDescriptor<?, ?> descriptor) {
+    protected void checkDescriptorIsActive(@NotNull final RedisIncomeCollectionLoadingDescriptor<?, ?> descriptor) {
         if (!descriptor.isInitialized()) {
             throw new ChannelConfigurationException("Channel descriptor " + descriptor.getName() + " is not initialized!");
+        }
+        if (!descriptor.isEnabled()) {
+            throw new ChannelConfigurationException("Channel descriptor " + descriptor.getName() + " is not enabled!");
         }
     }
 

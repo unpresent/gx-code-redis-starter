@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static lombok.AccessLevel.PROTECTED;
 
+@SuppressWarnings("unused")
 public class RedisOutcomeCollectionsUploader {
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">
@@ -45,7 +46,7 @@ public class RedisOutcomeCollectionsUploader {
             @NotNull final String key,
             @NotNull final O object
     ) throws Exception {
-        checkDescriptorIsInitialized(descriptor);
+        checkDescriptorIsActive(descriptor);
         internalUploadObject(descriptor, key, object);
     }
 
@@ -57,7 +58,7 @@ public class RedisOutcomeCollectionsUploader {
             @NotNull final RedisOutcomeCollectionLoadingDescriptor<O, P> descriptor,
             @NotNull final Map<String, O> objects
     ) throws Exception {
-        checkDescriptorIsInitialized(descriptor);
+        checkDescriptorIsActive(descriptor);
         internalUploadObjects(descriptor, objects);
     }
 
@@ -82,7 +83,7 @@ public class RedisOutcomeCollectionsUploader {
             @NotNull final Collection<O> objects,
             @NotNull final DataMemoryRepository<O, P> memoryRepository
     ) throws Exception {
-        checkDescriptorIsInitialized(descriptor);
+        checkDescriptorIsActive(descriptor);
         final var map = new HashMap<String, O>();
         for (final var obj : objects) {
             map.put(memoryRepository.extractKey(obj).toString(), obj);
@@ -98,9 +99,12 @@ public class RedisOutcomeCollectionsUploader {
      *
      * @param descriptor описатель.
      */
-    protected void checkDescriptorIsInitialized(@NotNull final RedisOutcomeCollectionLoadingDescriptor<?, ?> descriptor) {
+    protected void checkDescriptorIsActive(@NotNull final RedisOutcomeCollectionLoadingDescriptor<?, ?> descriptor) {
         if (!descriptor.isInitialized()) {
             throw new ChannelConfigurationException("Collection descriptor " + descriptor.getName() + " is not initialized!");
+        }
+        if (!descriptor.isEnabled()) {
+            throw new ChannelConfigurationException("Collection descriptor " + descriptor.getName() + " is not enabled!");
         }
     }
 
