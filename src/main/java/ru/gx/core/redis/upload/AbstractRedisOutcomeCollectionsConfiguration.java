@@ -9,8 +9,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import ru.gx.core.channels.AbstractChannelsConfiguration;
 import ru.gx.core.channels.ChannelConfigurationException;
-import ru.gx.core.channels.ChannelDescriptor;
 import ru.gx.core.channels.ChannelDirection;
+import ru.gx.core.channels.ChannelHandleDescriptor;
+import ru.gx.core.messaging.Message;
+import ru.gx.core.messaging.MessageBody;
+import ru.gx.core.messaging.MessageHeader;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -38,24 +41,25 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
     }
 
     @Override
-    protected RedisOutcomeCollectionLoadingDescriptorsDefaults createChannelDescriptorsDefaults() {
-        return new RedisOutcomeCollectionLoadingDescriptorsDefaults();
+    protected RedisOutcomeCollectionUploadingDescriptorsDefaults createChannelDescriptorsDefaults() {
+        return new RedisOutcomeCollectionUploadingDescriptorsDefaults();
     }
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Реализация OutcomeCollectionsConfiguration">
     @Override
-    protected boolean allowCreateDescriptor(@NotNull Class<? extends ChannelDescriptor> descriptorClass) {
-        return RedisOutcomeCollectionLoadingDescriptor.class.isAssignableFrom(descriptorClass);
+    protected <M extends Message<? extends MessageHeader, ? extends MessageBody>, D extends ChannelHandleDescriptor<M>>
+    boolean allowCreateDescriptor(@NotNull Class<D> descriptorClass) {
+        return RedisOutcomeCollectionUploadingDescriptor.class.isAssignableFrom(descriptorClass);
     }
 
     @Override
-    public @NotNull RedisOutcomeCollectionLoadingDescriptorsDefaults getDescriptorsDefaults() {
-        return (RedisOutcomeCollectionLoadingDescriptorsDefaults)super.getDescriptorsDefaults();
+    public @NotNull RedisOutcomeCollectionUploadingDescriptorsDefaults getDescriptorsDefaults() {
+        return (RedisOutcomeCollectionUploadingDescriptorsDefaults)super.getDescriptorsDefaults();
     }
 
     @Override
-    public void internalRegisterDescriptor(@NotNull ChannelDescriptor descriptor) {
+    public void internalRegisterDescriptor(@NotNull ChannelHandleDescriptor descriptor) {
         super.internalRegisterDescriptor(descriptor);
         if (this.connectionFactory == null) {
             throw new ChannelConfigurationException("Redis Connection factory isn't initialized!");

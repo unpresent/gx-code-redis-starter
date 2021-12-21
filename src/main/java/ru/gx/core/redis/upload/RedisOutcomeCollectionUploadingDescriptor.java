@@ -4,20 +4,22 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
-import ru.gx.core.channels.AbstractOutcomeChannelDescriptor;
+import ru.gx.core.channels.AbstractOutcomeChannelHandleDescriptor;
+import ru.gx.core.channels.ChannelApiDescriptor;
 import ru.gx.core.channels.SerializeMode;
-import ru.gx.core.data.DataObject;
-import ru.gx.core.data.DataPackage;
+import ru.gx.core.messaging.Message;
+import ru.gx.core.messaging.MessageBody;
+import ru.gx.core.messaging.MessageHeader;
 
 import java.security.InvalidParameterException;
-import java.util.Properties;
 
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class RedisOutcomeCollectionLoadingDescriptor<O extends DataObject, P extends DataPackage<O>>
-        extends AbstractOutcomeChannelDescriptor<O, P> {
+public class RedisOutcomeCollectionUploadingDescriptor<M extends Message<? extends MessageHeader, ? extends MessageBody>>
+        extends AbstractOutcomeChannelHandleDescriptor<M> {
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">
 
@@ -26,8 +28,12 @@ public class RedisOutcomeCollectionLoadingDescriptor<O extends DataObject, P ext
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialize">
 
-    public RedisOutcomeCollectionLoadingDescriptor(@NotNull final AbstractRedisOutcomeCollectionsConfiguration owner, @NotNull final String collection, final RedisOutcomeCollectionLoadingDescriptorsDefaults defaults) {
-        super(owner, collection, defaults);
+    public RedisOutcomeCollectionUploadingDescriptor(
+            @NotNull final AbstractRedisOutcomeCollectionsConfiguration owner,
+            @NotNull final ChannelApiDescriptor<M> api,
+            @Nullable final RedisOutcomeCollectionUploadingDescriptorsDefaults defaults
+    ) {
+        super(owner, api, defaults);
     }
 
     /**
@@ -37,13 +43,13 @@ public class RedisOutcomeCollectionLoadingDescriptor<O extends DataObject, P ext
      */
     @Override
     @NotNull
-    public RedisOutcomeCollectionLoadingDescriptor<O, P> init() throws InvalidParameterException {
+    public RedisOutcomeCollectionUploadingDescriptor<M> init() throws InvalidParameterException {
         super.init();
         return this;
     }
 
     @NotNull
-    public RedisOutcomeCollectionLoadingDescriptor<O, P> unInit() {
+    public RedisOutcomeCollectionUploadingDescriptor<M> unInit() {
         super.unInit();
         return this;
     }
@@ -58,12 +64,16 @@ public class RedisOutcomeCollectionLoadingDescriptor<O extends DataObject, P ext
 
     @NotNull
     public RedisTemplate<String, ?> getRedisTemplate() {
-        if (this.getSerializeMode() == SerializeMode.JsonString) {
+        if (this.getApi().getSerializeMode() == SerializeMode.JsonString) {
             return this.getOwner().getJsonStringRedisTemplate();
         }
         // this.getSerializeMode() == SerializeMode.Bytes:
         return this.getOwner().getBinaryRedisTemplate();
     }
+    // </editor-fold>
+    // -----------------------------------------------------------------------------------------------------------------
+    // <editor-fold desc="Messages generating">
+
     // </editor-fold>
     // -----------------------------------------------------------------------------------------------------------------
 }
