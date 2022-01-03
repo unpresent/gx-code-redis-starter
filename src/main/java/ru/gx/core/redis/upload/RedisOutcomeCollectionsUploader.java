@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.gx.core.channels.ChannelConfigurationException;
-import ru.gx.core.channels.ChannelHandleDescriptor;
+import ru.gx.core.channels.ChannelHandlerDescriptor;
 import ru.gx.core.channels.SerializeMode;
 import ru.gx.core.data.DataObject;
 import ru.gx.core.data.DataObjectKeyExtractor;
@@ -145,7 +145,7 @@ public class RedisOutcomeCollectionsUploader {
      *
      * @param descriptor описатель.
      */
-    protected void checkDescriptorIsActive(@NotNull final ChannelHandleDescriptor<?> descriptor) {
+    protected void checkDescriptorIsActive(@NotNull final ChannelHandlerDescriptor<?> descriptor) {
         if (!descriptor.isInitialized()) {
             throw new ChannelConfigurationException("Collection descriptor " + descriptor.getApi().getName() + " is not initialized!");
         }

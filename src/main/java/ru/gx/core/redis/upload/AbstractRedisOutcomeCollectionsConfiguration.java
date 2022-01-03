@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import ru.gx.core.channels.AbstractChannelsConfiguration;
 import ru.gx.core.channels.ChannelConfigurationException;
 import ru.gx.core.channels.ChannelDirection;
-import ru.gx.core.channels.ChannelHandleDescriptor;
+import ru.gx.core.channels.ChannelHandlerDescriptor;
 import ru.gx.core.messaging.Message;
 import ru.gx.core.messaging.MessageBody;
 import ru.gx.core.messaging.MessageHeader;
@@ -48,7 +48,7 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Реализация OutcomeCollectionsConfiguration">
     @Override
-    protected <M extends Message<? extends MessageHeader, ? extends MessageBody>, D extends ChannelHandleDescriptor<M>>
+    protected <M extends Message<? extends MessageHeader, ? extends MessageBody>, D extends ChannelHandlerDescriptor<M>>
     boolean allowCreateDescriptor(@NotNull Class<D> descriptorClass) {
         return RedisOutcomeCollectionUploadingDescriptor.class.isAssignableFrom(descriptorClass);
     }
@@ -59,7 +59,7 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
     }
 
     @Override
-    public void internalRegisterDescriptor(@NotNull ChannelHandleDescriptor descriptor) {
+    public void internalRegisterDescriptor(@NotNull ChannelHandlerDescriptor descriptor) {
         super.internalRegisterDescriptor(descriptor);
         if (this.connectionFactory == null) {
             throw new ChannelConfigurationException("Redis Connection factory isn't initialized!");

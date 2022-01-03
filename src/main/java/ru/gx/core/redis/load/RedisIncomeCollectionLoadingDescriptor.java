@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
-import ru.gx.core.channels.AbstractIncomeChannelHandleDescriptor;
+import ru.gx.core.channels.AbstractIncomeChannelHandlerDescriptor;
 import ru.gx.core.channels.ChannelApiDescriptor;
 import ru.gx.core.channels.SerializeMode;
 import ru.gx.core.messaging.Message;
@@ -25,7 +25,7 @@ import java.security.InvalidParameterException;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class RedisIncomeCollectionLoadingDescriptor<M extends Message<? extends MessageHeader, ? extends MessageBody>>
-        extends AbstractIncomeChannelHandleDescriptor<M> {
+        extends AbstractIncomeChannelHandlerDescriptor<M> {
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">
 

@@ -25,12 +25,6 @@ public class ConfigurationPropertiesServiceRedis {
     @Setter
     public static class IncomeCollections {
         @NestedConfigurationProperty
-        private SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
-
-        @NestedConfigurationProperty
-        private BootstrapConfiguration bootstrapConfiguration = new BootstrapConfiguration();
-
-        @NestedConfigurationProperty
         private StandardLoader standardLoader = new StandardLoader();
     }
 
@@ -38,22 +32,7 @@ public class ConfigurationPropertiesServiceRedis {
     @Setter
     public static class OutcomeCollections {
         @NestedConfigurationProperty
-        private SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
-
-        @NestedConfigurationProperty
         private StandardUploader standardUploader = new StandardUploader();
-    }
-
-    @Getter
-    @Setter
-    public static class SimpleConfiguration {
-        private boolean enabled = true;
-    }
-
-    @Getter
-    @Setter
-    public static class BootstrapConfiguration {
-        private boolean enabled = true;
     }
 
     @Getter

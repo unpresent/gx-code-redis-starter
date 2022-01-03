@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEventPublisher;
 import ru.gx.core.channels.ChannelConfigurationException;
-import ru.gx.core.channels.ChannelHandleDescriptor;
+import ru.gx.core.channels.ChannelHandlerDescriptor;
 import ru.gx.core.channels.IncomeDataProcessType;
 import ru.gx.core.channels.SerializeMode;
 import ru.gx.core.messaging.Message;
@@ -194,7 +194,7 @@ public class RedisIncomeCollectionsLoader implements ApplicationContextAware {
             final var strValue = (byte[]) record;
             message = (Message<MessageHeader, MessageBody>) this.objectMapper.readValue(strValue, descriptor.getApi().getMessageClass());
         }
-        message.setChannelDescriptor((ChannelHandleDescriptor<Message<MessageHeader, MessageBody>>) descriptor);
+        message.setChannelDescriptor((ChannelHandlerDescriptor<Message<MessageHeader, MessageBody>>) descriptor);
 
         if (descriptor.getProcessType() == IncomeDataProcessType.Immediate) {
             // Если обработка непосредственная, то прям в этом потоке вызываем обработчик(и) события.

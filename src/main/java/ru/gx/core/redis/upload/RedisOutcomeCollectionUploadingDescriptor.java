@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
-import ru.gx.core.channels.AbstractOutcomeChannelHandleDescriptor;
+import ru.gx.core.channels.AbstractOutcomeChannelHandlerDescriptor;
 import ru.gx.core.channels.ChannelApiDescriptor;
 import ru.gx.core.channels.SerializeMode;
 import ru.gx.core.messaging.Message;
@@ -19,7 +19,7 @@ import java.security.InvalidParameterException;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class RedisOutcomeCollectionUploadingDescriptor<M extends Message<? extends MessageHeader, ? extends MessageBody>>
-        extends AbstractOutcomeChannelHandleDescriptor<M> {
+        extends AbstractOutcomeChannelHandlerDescriptor<M> {
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">
 
