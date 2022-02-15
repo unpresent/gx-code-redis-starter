@@ -14,40 +14,12 @@ import ru.gx.core.redis.upload.RedisOutcomeCollectionsUploader;
 @Configuration
 @EnableConfigurationProperties({ConfigurationPropertiesServiceRedis.class})
 public class CommonAutoConfiguration {
-    private static final String SIMPLE_INCOME_CONFIG_PREFIX = ":in:simple-redis";
-    private static final String BOOSTRAP_INCOME_CONFIG_PREFIX = ":in:bootstrap-redis";
-    private static final String SIMPLE_OUTCOME_CONFIG_PREFIX = ":out:simple-redis";
-
-    @Value("${service.name}")
-    private String serviceName;
-
-    //    @Bean
-    //    @ConditionalOnMissingBean
-    //    @ConditionalOnProperty(value = "service.redis.income-collections.simple-configuration.enabled", havingValue = "true")
-    //    public SimpleRedisIncomeCollectionsConfiguration simpleRedisIncomeCollectionsConfiguration() {
-    //        return new SimpleRedisIncomeCollectionsConfiguration(this.serviceName + SIMPLE_INCOME_CONFIG_PREFIX);
-    //    }
-
-    //    @Bean
-    //    @ConditionalOnMissingBean
-    //    @ConditionalOnProperty(value = "service.redis.income-collections.bootstrap-configuration.enabled", havingValue = "true")
-    //    public BootstrapRedisIncomeCollectionsConfiguration bootstrapRedisIncomeCollectionsConfiguration() {
-    //        return new BootstrapRedisIncomeCollectionsConfiguration(this.serviceName + BOOSTRAP_INCOME_CONFIG_PREFIX);
-    //    }
-
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(value = "service.redis.income-collections.standard-loader.enabled", havingValue = "true")
     public RedisIncomeCollectionsLoader redisIncomeCollectionsLoader() {
         return new RedisIncomeCollectionsLoader();
     }
-
-    //    @Bean
-    //    @ConditionalOnMissingBean
-    //    @ConditionalOnProperty(value = "service.redis.outcome-collections.simple-configuration.enabled", havingValue = "true")
-    //    public SimpleRedisOutcomeCollectionsConfiguration simpleRedisOutcomeCollectionsConfiguration() {
-    //        return new SimpleRedisOutcomeCollectionsConfiguration(this.serviceName + SIMPLE_OUTCOME_CONFIG_PREFIX);
-    //    }
 
     @Bean
     @ConditionalOnMissingBean
