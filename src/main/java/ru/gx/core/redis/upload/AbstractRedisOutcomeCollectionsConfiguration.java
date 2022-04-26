@@ -1,14 +1,11 @@
 package ru.gx.core.redis.upload;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import ru.gx.core.channels.AbstractChannelsConfiguration;
-import ru.gx.core.channels.ChannelConfigurationException;
 import ru.gx.core.channels.ChannelDirection;
 import ru.gx.core.channels.ChannelHandlerDescriptor;
 import ru.gx.core.messaging.Message;
@@ -29,13 +26,14 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
     private final RedisTemplate<String, byte[]> binaryRedisTemplate;
 
     @Getter(PROTECTED)
-    @Setter(value = PROTECTED, onMethod_ = @Autowired)
-    private RedisConnectionFactory connectionFactory;
+    @NotNull
+    private final RedisConnectionFactory connectionFactory;
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialization">
-    protected AbstractRedisOutcomeCollectionsConfiguration(@NotNull final String configurationName) {
+    protected AbstractRedisOutcomeCollectionsConfiguration(@NotNull final String configurationName, @NotNull RedisConnectionFactory connectionFactory) {
         super(ChannelDirection.Out, configurationName);
+        this.connectionFactory = connectionFactory;
         this.jsonStringRedisTemplate = new StringRedisTemplate();
         this.binaryRedisTemplate = new RedisTemplate<>();
     }
@@ -61,9 +59,6 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
     @Override
     public void internalRegisterDescriptor(@NotNull ChannelHandlerDescriptor descriptor) {
         super.internalRegisterDescriptor(descriptor);
-        if (this.connectionFactory == null) {
-            throw new ChannelConfigurationException("Redis Connection factory isn't initialized!");
-        }
         if (this.binaryRedisTemplate.getConnectionFactory() != this.connectionFactory) {
             this.binaryRedisTemplate.setConnectionFactory(this.connectionFactory);
             this.binaryRedisTemplate.afterPropertiesSet();

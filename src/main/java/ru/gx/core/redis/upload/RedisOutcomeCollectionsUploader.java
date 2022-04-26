@@ -2,9 +2,7 @@ package ru.gx.core.redis.upload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.gx.core.channels.ChannelConfigurationException;
 import ru.gx.core.channels.ChannelHandlerDescriptor;
 import ru.gx.core.channels.SerializeMode;
@@ -31,22 +29,22 @@ public class RedisOutcomeCollectionsUploader {
      * ObjectMapper требуется для десериализации данных в объекты.
      */
     @Getter(PROTECTED)
-    @Setter(value = PROTECTED, onMethod_ = @Autowired)
     @NotNull
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     /**
      * DefaultMessagesFactory требуется для создания сообщений.
      */
     @Getter(PROTECTED)
-    @Setter(value = PROTECTED, onMethod_ = @Autowired)
     @NotNull
-    private DefaultMessagesFactory messagesFactory;
+    private final DefaultMessagesFactory messagesFactory;
 
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialization">
-    public RedisOutcomeCollectionsUploader() {
+    public RedisOutcomeCollectionsUploader(@NotNull final ObjectMapper objectMapper, @NotNull final DefaultMessagesFactory messagesFactory) {
+        this.objectMapper = objectMapper;
+        this.messagesFactory = messagesFactory;
     }
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------

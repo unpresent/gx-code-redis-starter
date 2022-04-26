@@ -3,14 +3,10 @@ package ru.gx.core.redis.load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEventPublisher;
 import ru.gx.core.channels.ChannelConfigurationException;
 import ru.gx.core.channels.ChannelHandlerDescriptor;
@@ -28,50 +24,50 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static lombok.AccessLevel.PROTECTED;
-import static lombok.AccessLevel.PUBLIC;
 
 /**
  * Базовая реализация загрузчика, который упрощает задачу чтения данных из очереди и десериалиазции их в объекты.
  */
 @SuppressWarnings("unused")
 @Slf4j
-public class RedisIncomeCollectionsLoader implements ApplicationContextAware {
+public class RedisIncomeCollectionsLoader {
     private final static int MAX_SLEEP_MS = 64;
 
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">
+
     /**
-     * Объект контекста требуется для вызова событий и для получения бинов(!).
+     * Требуется для отправки сообщений в обработку.
      */
     @Getter(PROTECTED)
-    @Setter(value = PUBLIC, onMethod_ = @Autowired)
-    private ApplicationContext applicationContext;
+    @NotNull
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * ObjectMapper требуется для десериализации данных в объекты.
      */
     @Getter(PROTECTED)
-    @Setter(value = PROTECTED, onMethod_ = @Autowired)
-    private ObjectMapper objectMapper;
+    @NotNull
+    private final ObjectMapper objectMapper;
 
     /**
      * Требуется для отправки сообщений в обработку.
      */
     @Getter(PROTECTED)
-    @Setter(value = PROTECTED, onMethod_ = @Autowired)
-    private MessagesPrioritizedQueue eventsQueue;
-
-    /**
-     * Требуется для отправки сообщений в обработку.
-     */
-    @Getter(PROTECTED)
-    @Setter(value = PROTECTED, onMethod_ = @Autowired)
-    private ApplicationEventPublisher eventPublisher;
+    @NotNull
+    private final MessagesPrioritizedQueue eventsQueue;
 
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialization">
-    public RedisIncomeCollectionsLoader() {
+    public RedisIncomeCollectionsLoader(
+            @NotNull final ApplicationEventPublisher eventPublisher,
+            @NotNull final ObjectMapper objectMapper,
+            @NotNull final MessagesPrioritizedQueue eventsQueue
+    ) {
+        this.eventPublisher = eventPublisher;
+        this.objectMapper = objectMapper;
+        this.eventsQueue = eventsQueue;
     }
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
