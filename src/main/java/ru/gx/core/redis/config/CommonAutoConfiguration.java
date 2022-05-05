@@ -43,12 +43,12 @@ public class CommonAutoConfiguration {
         return new RedisOutcomeCollectionsUploader(objectMapper, messagesFactory);
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    LettuceConnectionFactory lettuceConnectionFactory(
-            @Value("${service.redis.server}") String server,
-            @Value("${service.redis.port}") int port
-    ) {
-        return new LettuceConnectionFactory(new RedisStandaloneConfiguration(server, port));
-    }
+    //    @Bean
+    //    @ConditionalOnMissingBean
+    //    LettuceConnectionFactory lettuceConnectionFactory(
+    //            @Value("${service.redis.server}") String server,
+    //            @Value("${service.redis.port}") int port
+    //    ) {
+    //        return new LettuceConnectionFactory(new RedisStandaloneConfiguration(server, port));
+    //    }
 }

@@ -9,11 +9,11 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 @Getter
 @Setter
 public class ConfigurationPropertiesServiceRedis {
-    public static final String SERVER_DEFAULT = "localhost";
-    public static final int PORT_DEFAULT = 6379;
+    //    public static final String SERVER_DEFAULT = "localhost";
+    //    public static final int PORT_DEFAULT = 6379;
 
-    private String server = SERVER_DEFAULT;
-    private int port = PORT_DEFAULT;
+    //    private String server = SERVER_DEFAULT;
+    //    private int port = PORT_DEFAULT;
 
     @NestedConfigurationProperty
     private IncomeCollections incomeCollections;
