@@ -2,6 +2,7 @@ package ru.gx.core.redis.upload;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import ru.gx.core.channels.ChannelConfigurationException;
 import ru.gx.core.channels.ChannelHandlerDescriptor;
@@ -12,7 +13,6 @@ import ru.gx.core.data.DataPackage;
 import ru.gx.core.messaging.DefaultMessagesFactory;
 import ru.gx.core.messaging.Message;
 import ru.gx.core.messaging.MessageBody;
-import ru.gx.core.messaging.MessageHeader;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,7 +20,8 @@ import java.util.Map;
 
 import static lombok.AccessLevel.PROTECTED;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassCanBeRecord"})
+@Slf4j
 public class RedisOutcomeCollectionsUploader {
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">
@@ -53,7 +54,7 @@ public class RedisOutcomeCollectionsUploader {
     /**
      * Выгрузка одного объекта в Redis
      */
-    public <M extends Message<? extends MessageHeader, ? extends MessageBody>>
+    public <M extends Message<? extends MessageBody>>
     void uploadMessage(
             @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
             @NotNull final String key,
@@ -66,7 +67,7 @@ public class RedisOutcomeCollectionsUploader {
     /**
      * Выгрузка списка объектов в Redis
      */
-    public <M extends Message<? extends MessageHeader, ? extends MessageBody>>
+    public <M extends Message<? extends MessageBody>>
     void uploadMessagesWithKeys(
             @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
             @NotNull final Map<String, M> messages
@@ -78,14 +79,14 @@ public class RedisOutcomeCollectionsUploader {
     /**
      * Выгрузка списка объектов в Redis
      */
-    public <M extends Message<? extends MessageHeader, ? extends MessageBody>, O extends DataObject>
+    public <M extends Message<? extends MessageBody>, O extends DataObject>
     void uploadDataObject(
             @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
             @NotNull final String key,
             @NotNull final O object
     ) throws Exception {
         checkDescriptorIsActive(descriptor);
-        final var message = this.messagesFactory
+        final var message = getMessagesFactory()
                 .<M>createByDataObject(
                         null,
                         descriptor.getApi().getMessageType(),
@@ -99,7 +100,7 @@ public class RedisOutcomeCollectionsUploader {
     /**
      * Выгрузка списка объектов в Redis
      */
-    public <M extends Message<? extends MessageHeader, ? extends MessageBody>, O extends DataObject, P extends DataPackage<O>>
+    public <M extends Message<? extends MessageBody>, O extends DataObject, P extends DataPackage<O>>
     void uploadDataPackage(
             @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
             @NotNull final P objects,
@@ -111,7 +112,7 @@ public class RedisOutcomeCollectionsUploader {
     /**
      * Выгрузка списка объектов в Redis
      */
-    public <M extends Message<? extends MessageHeader, ? extends MessageBody>, O extends DataObject>
+    public <M extends Message<? extends MessageBody>, O extends DataObject>
     void uploadDataObjects(
             @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
             @NotNull final Collection<O> objects,
@@ -121,7 +122,7 @@ public class RedisOutcomeCollectionsUploader {
 
         final var map = new HashMap<String, M>();
         for (final var obj : objects) {
-            final var message = this.messagesFactory
+            final var message = getMessagesFactory()
                     .<M>createByDataObject(
                             null,
                             descriptor.getApi().getMessageType(),
@@ -152,7 +153,7 @@ public class RedisOutcomeCollectionsUploader {
         }
     }
 
-    protected <M extends Message<? extends MessageHeader, ? extends MessageBody>>
+    protected <M extends Message<? extends MessageBody>>
     void internalUploadMessage(
             @NotNull RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
             @NotNull String key,
@@ -161,15 +162,15 @@ public class RedisOutcomeCollectionsUploader {
 
         Object serializedData;
         if (descriptor.getApi().getSerializeMode() == SerializeMode.JsonString) {
-            serializedData = this.objectMapper.writeValueAsString(message);
+            serializedData = getObjectMapper().writeValueAsString(message);
         } else {
-            serializedData = this.objectMapper.writeValueAsBytes(message);
+            serializedData = getObjectMapper().writeValueAsBytes(message);
         }
         final var template = descriptor.getRedisTemplate();
         template.opsForHash().put(descriptor.getApi().getName(), key, serializedData);
     }
 
-    protected <M extends Message<? extends MessageHeader, ? extends MessageBody>>
+    protected <M extends Message<? extends MessageBody>>
     void internalUploadMessages(
             @NotNull RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
             @NotNull Map<String, M> messages
@@ -178,11 +179,11 @@ public class RedisOutcomeCollectionsUploader {
         final var serializedData = new HashMap<String, Object>();
         if (descriptor.getApi().getSerializeMode() == SerializeMode.JsonString) {
             for (final var entry : messages.entrySet()) {
-                serializedData.put(entry.getKey(), this.objectMapper.writeValueAsString(entry.getValue()));
+                serializedData.put(entry.getKey(), getObjectMapper().writeValueAsString(entry.getValue()));
             }
         } else {
             for (final var entry : messages.entrySet()) {
-                serializedData.put(entry.getKey(), this.objectMapper.writeValueAsBytes(entry.getValue()));
+                serializedData.put(entry.getKey(), getObjectMapper().writeValueAsBytes(entry.getValue()));
             }
         }
         final var template = descriptor.getRedisTemplate();

@@ -14,7 +14,6 @@ import ru.gx.core.channels.IncomeDataProcessType;
 import ru.gx.core.channels.SerializeMode;
 import ru.gx.core.messaging.Message;
 import ru.gx.core.messaging.MessageBody;
-import ru.gx.core.messaging.MessageHeader;
 import ru.gx.core.messaging.MessagesPrioritizedQueue;
 import ru.gx.core.redis.IncomeCollectionSortMode;
 
@@ -28,7 +27,7 @@ import static lombok.AccessLevel.PROTECTED;
 /**
  * Базовая реализация загрузчика, который упрощает задачу чтения данных из очереди и десериалиазции их в объекты.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ClassCanBeRecord"})
 @Slf4j
 public class RedisIncomeCollectionsLoader {
     private final static int MAX_SLEEP_MS = 64;
@@ -101,7 +100,7 @@ public class RedisIncomeCollectionsLoader {
             }
             for (var descriptor : collectionDescriptors) {
                 if (descriptor.isEnabled()) {
-                    if (descriptor instanceof final RedisIncomeCollectionLoadingDescriptor<? extends Message<? extends MessageHeader, ? extends MessageBody>> redisDescriptor) {
+                    if (descriptor instanceof final RedisIncomeCollectionLoadingDescriptor<? extends Message<? extends MessageBody>> redisDescriptor) {
                         log.debug("Loading working data from collection: {}", descriptor.getApi().getName());
                         final var eventsCount = processByCollection(redisDescriptor);
                         result.put(redisDescriptor, eventsCount);
@@ -182,30 +181,30 @@ public class RedisIncomeCollectionsLoader {
     @SuppressWarnings({"BusyWait", "unchecked"})
     @SneakyThrows({InterruptedException.class, JsonProcessingException.class, IOException.class})
     protected void internalProcessRecord(@NotNull final RedisIncomeCollectionLoadingDescriptor<?> descriptor, @NotNull final Object record) {
-        Message<MessageHeader, MessageBody> message;
+        Message<MessageBody> message;
         if (descriptor.getApi().getSerializeMode() == SerializeMode.JsonString) {
             final var strValue = (String) record;
-            message = (Message<MessageHeader, MessageBody>) this.objectMapper.readValue(strValue, descriptor.getApi().getMessageClass());
+            message = (Message<MessageBody>) getObjectMapper().readValue(strValue, descriptor.getApi().getMessageClass());
         } else {
             final var strValue = (byte[]) record;
-            message = (Message<MessageHeader, MessageBody>) this.objectMapper.readValue(strValue, descriptor.getApi().getMessageClass());
+            message = (Message<MessageBody>) getObjectMapper().readValue(strValue, descriptor.getApi().getMessageClass());
         }
-        message.setChannelDescriptor((ChannelHandlerDescriptor<Message<MessageHeader, MessageBody>>) descriptor);
+        message.setChannelDescriptor((ChannelHandlerDescriptor<Message<MessageBody>>) descriptor);
 
         if (descriptor.getProcessType() == IncomeDataProcessType.Immediate) {
             // Если обработка непосредственная, то прям в этом потоке вызываем обработчик(и) события.
-            this.eventPublisher.publishEvent(message);
+            getEventPublisher().publishEvent(message);
         } else {
             // Перед тем, как положить в очередь требуется дождаться "зеленного сигнала".
             var sleepMs = 1;
-            while (!this.eventsQueue.allowPush()) {
+            while (!getEventsQueue().allowPush()) {
                 Thread.sleep(sleepMs);
                 if (sleepMs < MAX_SLEEP_MS) {
                     sleepMs *= 2;
                 }
             }
             // Собственно только теперь бросаем событие в очередь
-            this.eventsQueue.pushMessage(descriptor.getPriority(), message);
+            getEventsQueue().pushMessage(descriptor.getPriority(), message);
         }
     }
 

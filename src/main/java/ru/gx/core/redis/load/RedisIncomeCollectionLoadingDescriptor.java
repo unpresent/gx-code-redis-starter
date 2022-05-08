@@ -24,7 +24,7 @@ import java.security.InvalidParameterException;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class RedisIncomeCollectionLoadingDescriptor<M extends Message<? extends MessageHeader, ? extends MessageBody>>
+public class RedisIncomeCollectionLoadingDescriptor<M extends Message<? extends MessageBody>>
         extends AbstractIncomeChannelHandlerDescriptor<M> {
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">

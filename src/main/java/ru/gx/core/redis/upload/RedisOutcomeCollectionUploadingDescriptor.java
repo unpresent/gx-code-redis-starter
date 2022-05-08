@@ -11,14 +11,13 @@ import ru.gx.core.channels.ChannelApiDescriptor;
 import ru.gx.core.channels.SerializeMode;
 import ru.gx.core.messaging.Message;
 import ru.gx.core.messaging.MessageBody;
-import ru.gx.core.messaging.MessageHeader;
 
 import java.security.InvalidParameterException;
 
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class RedisOutcomeCollectionUploadingDescriptor<M extends Message<? extends MessageHeader, ? extends MessageBody>>
+public class RedisOutcomeCollectionUploadingDescriptor<M extends Message<? extends MessageBody>>
         extends AbstractOutcomeChannelHandlerDescriptor<M> {
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">

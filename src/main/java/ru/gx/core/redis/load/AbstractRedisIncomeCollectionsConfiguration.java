@@ -10,7 +10,6 @@ import ru.gx.core.channels.ChannelDirection;
 import ru.gx.core.channels.ChannelHandlerDescriptor;
 import ru.gx.core.messaging.Message;
 import ru.gx.core.messaging.MessageBody;
-import ru.gx.core.messaging.MessageHeader;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -47,7 +46,7 @@ public abstract class AbstractRedisIncomeCollectionsConfiguration extends Abstra
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="реализация IncomeCollectionsConfiguration">
     @Override
-    protected <M extends Message<? extends MessageHeader, ? extends MessageBody>, D extends ChannelHandlerDescriptor<M>>
+    protected <M extends Message<? extends MessageBody>, D extends ChannelHandlerDescriptor<M>>
     boolean allowCreateDescriptor(@NotNull Class<D> descriptorClass) {
         return RedisIncomeCollectionLoadingDescriptor.class.isAssignableFrom(descriptorClass);
     }
@@ -60,13 +59,13 @@ public abstract class AbstractRedisIncomeCollectionsConfiguration extends Abstra
     @Override
     public void internalRegisterDescriptor(@NotNull ChannelHandlerDescriptor descriptor) {
         super.internalRegisterDescriptor(descriptor);
-        if (this.binaryRedisTemplate.getConnectionFactory() != this.connectionFactory) {
-            this.binaryRedisTemplate.setConnectionFactory(this.connectionFactory);
-            this.binaryRedisTemplate.afterPropertiesSet();
+        if (getBinaryRedisTemplate().getConnectionFactory() != getConnectionFactory()) {
+            getBinaryRedisTemplate().setConnectionFactory(getConnectionFactory());
+            getBinaryRedisTemplate().afterPropertiesSet();
         }
-        if (this.jsonStringRedisTemplate.getConnectionFactory() != this.connectionFactory) {
-            this.jsonStringRedisTemplate.setConnectionFactory(this.connectionFactory);
-            this.jsonStringRedisTemplate.afterPropertiesSet();
+        if (getJsonStringRedisTemplate().getConnectionFactory() != getConnectionFactory()) {
+            getJsonStringRedisTemplate().setConnectionFactory(getConnectionFactory());
+            getJsonStringRedisTemplate().afterPropertiesSet();
         }
     }
     // </editor-fold>
