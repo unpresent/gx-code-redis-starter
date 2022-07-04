@@ -56,7 +56,7 @@ public class RedisOutcomeCollectionsUploader {
      */
     public <M extends Message<? extends MessageBody>>
     void uploadMessage(
-            @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
+            @NotNull final RedisOutcomeCollectionUploadingDescriptor descriptor,
             @NotNull final String key,
             @NotNull final M message
     ) throws Exception {
@@ -69,7 +69,7 @@ public class RedisOutcomeCollectionsUploader {
      */
     public <M extends Message<? extends MessageBody>>
     void uploadMessagesWithKeys(
-            @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
+            @NotNull final RedisOutcomeCollectionUploadingDescriptor descriptor,
             @NotNull final Map<String, M> messages
     ) throws Exception {
         checkDescriptorIsActive(descriptor);
@@ -81,16 +81,21 @@ public class RedisOutcomeCollectionsUploader {
      */
     public <M extends Message<? extends MessageBody>, O extends DataObject>
     void uploadDataObject(
-            @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
+            @NotNull final RedisOutcomeCollectionUploadingDescriptor descriptor,
             @NotNull final String key,
             @NotNull final O object
     ) throws Exception {
         checkDescriptorIsActive(descriptor);
+        final var api = descriptor.getApi();
+        if (api == null) {
+            throw new NullPointerException("descriptor.getApi() is null!");
+        }
+
         final var message = getMessagesFactory()
                 .<M>createByDataObject(
                         null,
-                        descriptor.getApi().getMessageType(),
-                        descriptor.getApi().getVersion(),
+                        api.getMessageType(),
+                        api.getVersion(),
                         object,
                         null
                 );
@@ -102,7 +107,7 @@ public class RedisOutcomeCollectionsUploader {
      */
     public <M extends Message<? extends MessageBody>, O extends DataObject, P extends DataPackage<O>>
     void uploadDataPackage(
-            @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
+            @NotNull final RedisOutcomeCollectionUploadingDescriptor descriptor,
             @NotNull final P objects,
             @NotNull final DataObjectKeyExtractor<O> keyExtractor
     ) throws Exception {
@@ -114,19 +119,23 @@ public class RedisOutcomeCollectionsUploader {
      */
     public <M extends Message<? extends MessageBody>, O extends DataObject>
     void uploadDataObjects(
-            @NotNull final RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
+            @NotNull final RedisOutcomeCollectionUploadingDescriptor descriptor,
             @NotNull final Collection<O> objects,
             @NotNull final DataObjectKeyExtractor<O> keyExtractor
     ) throws Exception {
         checkDescriptorIsActive(descriptor);
+        final var api = descriptor.getApi();
+        if (api == null) {
+            throw new NullPointerException("descriptor.getApi() is null!");
+        }
 
         final var map = new HashMap<String, M>();
         for (final var obj : objects) {
             final var message = getMessagesFactory()
                     .<M>createByDataObject(
                             null,
-                            descriptor.getApi().getMessageType(),
-                            descriptor.getApi().getVersion(),
+                            api.getMessageType(),
+                            api.getVersion(),
                             obj,
                             null
                     );
@@ -144,24 +153,28 @@ public class RedisOutcomeCollectionsUploader {
      *
      * @param descriptor описатель.
      */
-    protected void checkDescriptorIsActive(@NotNull final ChannelHandlerDescriptor<?> descriptor) {
+    protected void checkDescriptorIsActive(@NotNull final ChannelHandlerDescriptor descriptor) {
         if (!descriptor.isInitialized()) {
-            throw new ChannelConfigurationException("Collection descriptor " + descriptor.getApi().getName() + " is not initialized!");
+            throw new ChannelConfigurationException("Collection descriptor " + descriptor.getChannelName() + " is not initialized!");
         }
         if (!descriptor.isEnabled()) {
-            throw new ChannelConfigurationException("Collection descriptor " + descriptor.getApi().getName() + " is not enabled!");
+            throw new ChannelConfigurationException("Collection descriptor " + descriptor.getChannelName() + " is not enabled!");
         }
     }
 
     protected <M extends Message<? extends MessageBody>>
     void internalUploadMessage(
-            @NotNull RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
+            @NotNull RedisOutcomeCollectionUploadingDescriptor descriptor,
             @NotNull String key,
             @NotNull M message
     ) throws Exception {
+        final var api = descriptor.getApi();
+        if (api == null) {
+            throw new NullPointerException("descriptor.getApi() is null!");
+        }
 
         Object serializedData;
-        if (descriptor.getApi().getSerializeMode() == SerializeMode.JsonString) {
+        if (api.getSerializeMode() == SerializeMode.JsonString) {
             serializedData = getObjectMapper().writeValueAsString(message);
         } else {
             serializedData = getObjectMapper().writeValueAsBytes(message);
@@ -172,12 +185,16 @@ public class RedisOutcomeCollectionsUploader {
 
     protected <M extends Message<? extends MessageBody>>
     void internalUploadMessages(
-            @NotNull RedisOutcomeCollectionUploadingDescriptor<M> descriptor,
+            @NotNull RedisOutcomeCollectionUploadingDescriptor descriptor,
             @NotNull Map<String, M> messages
     ) throws Exception {
+        final var api = descriptor.getApi();
+        if (api == null) {
+            throw new NullPointerException("descriptor.getApi() is null!");
+        }
 
         final var serializedData = new HashMap<String, Object>();
-        if (descriptor.getApi().getSerializeMode() == SerializeMode.JsonString) {
+        if (api.getSerializeMode() == SerializeMode.JsonString) {
             for (final var entry : messages.entrySet()) {
                 serializedData.put(entry.getKey(), getObjectMapper().writeValueAsString(entry.getValue()));
             }

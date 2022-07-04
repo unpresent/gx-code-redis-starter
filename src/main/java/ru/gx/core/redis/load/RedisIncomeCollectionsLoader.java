@@ -78,7 +78,7 @@ public class RedisIncomeCollectionsLoader {
      * @param descriptor Описатель загрузки из Топика.
      * @return Список загруженных объектов.
      */
-    public int processByCollection(@NotNull final RedisIncomeCollectionLoadingDescriptor<?> descriptor) {
+    public int processByCollection(@NotNull final RedisIncomeCollectionLoadingDescriptor descriptor) {
         checkDescriptorIsActive(descriptor);
         return internalProcessDescriptor(descriptor);
     }
@@ -89,10 +89,10 @@ public class RedisIncomeCollectionsLoader {
      * @return Map-а, в которой для каждого дескриптора указан список загруженных объектов.
      */
     @NotNull
-    public Map<RedisIncomeCollectionLoadingDescriptor<?>, Integer>
+    public Map<RedisIncomeCollectionLoadingDescriptor, Integer>
     processAllCollections(@NotNull final AbstractRedisIncomeCollectionsConfiguration configuration) throws InvalidParameterException {
         final var pCount = configuration.prioritiesCount();
-        final var result = new HashMap<RedisIncomeCollectionLoadingDescriptor<?>, Integer>();
+        final var result = new HashMap<RedisIncomeCollectionLoadingDescriptor, Integer>();
         for (int p = 0; p < pCount; p++) {
             final var collectionDescriptors = configuration.getByPriority(p);
             if (collectionDescriptors == null) {
@@ -100,13 +100,13 @@ public class RedisIncomeCollectionsLoader {
             }
             for (var descriptor : collectionDescriptors) {
                 if (descriptor.isEnabled()) {
-                    if (descriptor instanceof final RedisIncomeCollectionLoadingDescriptor<? extends Message<? extends MessageBody>> redisDescriptor) {
-                        log.debug("Loading working data from collection: {}", descriptor.getApi().getName());
+                    if (descriptor instanceof final RedisIncomeCollectionLoadingDescriptor redisDescriptor) {
+                        log.debug("Loading working data from collection: {}", descriptor.getChannelName());
                         final var eventsCount = processByCollection(redisDescriptor);
                         result.put(redisDescriptor, eventsCount);
-                        log.debug("Loaded working data from collection. Events: {}", redisDescriptor.getApi().getName());
+                        log.debug("Loaded working data from collection. Events: {}", redisDescriptor.getChannelName());
                     } else {
-                        throw new ChannelConfigurationException("Invalid class of descriptor " + descriptor.getApi().getName());
+                        throw new ChannelConfigurationException("Invalid class of descriptor " + descriptor.getChannelName());
                     }
                 }
             }
@@ -123,12 +123,12 @@ public class RedisIncomeCollectionsLoader {
      *
      * @param descriptor описатель, который проверяем.
      */
-    protected void checkDescriptorIsActive(@NotNull final RedisIncomeCollectionLoadingDescriptor<?> descriptor) {
+    protected void checkDescriptorIsActive(@NotNull final RedisIncomeCollectionLoadingDescriptor descriptor) {
         if (!descriptor.isInitialized()) {
-            throw new ChannelConfigurationException("Channel descriptor " + descriptor.getApi().getName() + " is not initialized!");
+            throw new ChannelConfigurationException("Channel descriptor " + descriptor.getChannelName() + " is not initialized!");
         }
         if (!descriptor.isEnabled()) {
-            throw new ChannelConfigurationException("Channel descriptor " + descriptor.getApi().getName() + " is not enabled!");
+            throw new ChannelConfigurationException("Channel descriptor " + descriptor.getChannelName() + " is not enabled!");
         }
     }
 
@@ -139,7 +139,7 @@ public class RedisIncomeCollectionsLoader {
      * @return Список событий на обработку.
      */
     @SneakyThrows
-    protected int internalProcessDescriptor(@NotNull final RedisIncomeCollectionLoadingDescriptor<?> descriptor) {
+    protected int internalProcessDescriptor(@NotNull final RedisIncomeCollectionLoadingDescriptor descriptor) {
         // TODO: Добавить сбор статистики
         final var records = internalLoadAll(descriptor);
 
@@ -180,8 +180,13 @@ public class RedisIncomeCollectionsLoader {
      */
     @SuppressWarnings({"BusyWait", "unchecked"})
     @SneakyThrows({InterruptedException.class, JsonProcessingException.class, IOException.class})
-    protected void internalProcessRecord(@NotNull final RedisIncomeCollectionLoadingDescriptor<?> descriptor, @NotNull final Object record) {
+    protected void internalProcessRecord(@NotNull final RedisIncomeCollectionLoadingDescriptor descriptor, @NotNull final Object record) {
         Message<MessageBody> message;
+        final var api = descriptor.getApi();
+        if (api == null) {
+            throw new NullPointerException("descriptor.getApi() is null!");
+        }
+
         if (descriptor.getApi().getSerializeMode() == SerializeMode.JsonString) {
             final var strValue = (String) record;
             message = (Message<MessageBody>) getObjectMapper().readValue(strValue, descriptor.getApi().getMessageClass());
@@ -189,7 +194,7 @@ public class RedisIncomeCollectionsLoader {
             final var strValue = (byte[]) record;
             message = (Message<MessageBody>) getObjectMapper().readValue(strValue, descriptor.getApi().getMessageClass());
         }
-        message.setChannelDescriptor((ChannelHandlerDescriptor<Message<MessageBody>>) descriptor);
+        message.setChannelDescriptor(descriptor);
 
         if (descriptor.getProcessType() == IncomeDataProcessType.Immediate) {
             // Если обработка непосредственная, то прям в этом потоке вызываем обработчик(и) события.
@@ -215,10 +220,10 @@ public class RedisIncomeCollectionsLoader {
      * @return Записи Коллекции.
      */
     @Nullable
-    protected Object internalLoad(@NotNull final RedisIncomeCollectionLoadingDescriptor<?> descriptor, @NotNull final String key) {
+    protected Object internalLoad(@NotNull final RedisIncomeCollectionLoadingDescriptor descriptor, @NotNull final String key) {
         final var template = descriptor.getRedisTemplate();
-        final var record = template.opsForHash().get(descriptor.getApi().getName(), key);
-        log.debug("Collection: {}; loaded 1 record by key: {}", descriptor.getApi().getName(), key);
+        final var record = template.opsForHash().get(descriptor.getChannelName(), key);
+        log.debug("Collection: {}; loaded 1 record by key: {}", descriptor.getChannelName(), key);
         return record;
     }
 
@@ -229,10 +234,10 @@ public class RedisIncomeCollectionsLoader {
      * @return Записи Коллекции.
      */
     @NotNull
-    protected Map<Object, Object> internalLoadAll(@NotNull final RedisIncomeCollectionLoadingDescriptor<?> descriptor) {
+    protected Map<Object, Object> internalLoadAll(@NotNull final RedisIncomeCollectionLoadingDescriptor descriptor) {
         final var template = descriptor.getRedisTemplate();
-        final var records = template.opsForHash().entries(descriptor.getApi().getName());
-        log.debug("Collection: {}; loaded: {} records", descriptor.getApi().getName(), records.keySet().size());
+        final var records = template.opsForHash().entries(descriptor.getChannelName());
+        log.debug("Collection: {}; loaded: {} records", descriptor.getChannelName(), records.keySet().size());
         return records;
     }
     // </editor-fold>

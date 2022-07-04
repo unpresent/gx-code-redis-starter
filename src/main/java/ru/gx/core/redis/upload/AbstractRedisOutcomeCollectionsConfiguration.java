@@ -8,8 +8,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import ru.gx.core.channels.AbstractChannelsConfiguration;
 import ru.gx.core.channels.ChannelDirection;
 import ru.gx.core.channels.ChannelHandlerDescriptor;
-import ru.gx.core.messaging.Message;
-import ru.gx.core.messaging.MessageBody;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -45,7 +43,7 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Реализация OutcomeCollectionsConfiguration">
     @Override
-    protected <M extends Message<? extends MessageBody>, D extends ChannelHandlerDescriptor<M>>
+    protected <D extends ChannelHandlerDescriptor>
     boolean allowCreateDescriptor(@NotNull Class<D> descriptorClass) {
         return RedisOutcomeCollectionUploadingDescriptor.class.isAssignableFrom(descriptorClass);
     }
