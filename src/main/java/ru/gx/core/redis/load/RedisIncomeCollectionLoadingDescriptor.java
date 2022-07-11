@@ -41,23 +41,23 @@ public class RedisIncomeCollectionLoadingDescriptor
     ) {
         super(owner, api, defaults);
         this.sortMode = IncomeCollectionSortMode.None;
+        internalInitDefaults(defaults);
     }
 
     public RedisIncomeCollectionLoadingDescriptor(
             @NotNull final ChannelsConfiguration owner,
             @NotNull final String channelName,
-            @Nullable final IncomeChannelDescriptorsDefaults defaults
+            @Nullable final RedisIncomeCollectionLoadingDescriptorsDefaults defaults
     ) {
         super(owner, channelName, defaults);
         this.sortMode = IncomeCollectionSortMode.None;
+        internalInitDefaults(defaults);
     }
 
-    @Override
-    protected void internalInitDefaults(@Nullable IncomeChannelDescriptorsDefaults defaults) {
-        super.internalInitDefaults(defaults);
-        if (defaults instanceof final RedisIncomeCollectionLoadingDescriptorsDefaults redisDefaults) {
+    private void internalInitDefaults(@Nullable RedisIncomeCollectionLoadingDescriptorsDefaults defaults) {
+        if (defaults != null) {
             this
-                    .setSortMode(redisDefaults.getSortMode());
+                    .setSortMode(defaults.getSortMode());
         }
     }
 
