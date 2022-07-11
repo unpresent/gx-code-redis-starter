@@ -38,6 +38,7 @@ public class RedisOutcomeCollectionUploadingDescriptor
             @NotNull final String channelName,
             @Nullable final OutcomeChannelDescriptorsDefaults defaults) {
         super(owner, channelName, defaults);
+        throw new NullPointerException("getApi() is null!");
     }
 
     /**
