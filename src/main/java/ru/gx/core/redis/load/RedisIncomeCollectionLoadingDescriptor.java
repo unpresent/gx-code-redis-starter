@@ -34,7 +34,7 @@ public class RedisIncomeCollectionLoadingDescriptor
     // </editor-fold>
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialize">
-    protected RedisIncomeCollectionLoadingDescriptor(
+    public RedisIncomeCollectionLoadingDescriptor(
             @NotNull final AbstractRedisIncomeCollectionsConfiguration owner,
             @NotNull final ChannelApiDescriptor<? extends Message<? extends MessageBody>> api,
             @Nullable final RedisIncomeCollectionLoadingDescriptorsDefaults defaults
@@ -43,7 +43,7 @@ public class RedisIncomeCollectionLoadingDescriptor
         this.sortMode = IncomeCollectionSortMode.None;
     }
 
-    protected RedisIncomeCollectionLoadingDescriptor(
+    public RedisIncomeCollectionLoadingDescriptor(
             @NotNull final ChannelsConfiguration owner,
             @NotNull final String channelName,
             @Nullable final IncomeChannelDescriptorsDefaults defaults

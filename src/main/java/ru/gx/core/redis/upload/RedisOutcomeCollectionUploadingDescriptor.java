@@ -25,7 +25,7 @@ public class RedisOutcomeCollectionUploadingDescriptor
     // -----------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialize">
 
-    protected RedisOutcomeCollectionUploadingDescriptor(
+    public RedisOutcomeCollectionUploadingDescriptor(
             @NotNull final AbstractRedisOutcomeCollectionsConfiguration owner,
             @NotNull final ChannelApiDescriptor<? extends Message<? extends MessageBody>> api,
             @Nullable final RedisOutcomeCollectionUploadingDescriptorsDefaults defaults
@@ -33,7 +33,7 @@ public class RedisOutcomeCollectionUploadingDescriptor
         super(owner, api, defaults);
     }
 
-    protected RedisOutcomeCollectionUploadingDescriptor(
+    public RedisOutcomeCollectionUploadingDescriptor(
             @NotNull final ChannelsConfiguration owner,
             @NotNull final String channelName,
             @Nullable final OutcomeChannelDescriptorsDefaults defaults) {
