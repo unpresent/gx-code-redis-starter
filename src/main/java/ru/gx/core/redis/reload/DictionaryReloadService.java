@@ -11,7 +11,7 @@ import ru.gx.core.redis.RedisDictionary;
 @Slf4j
 public class DictionaryReloadService {
 
-    public static final ReloadDictionaryMessage MESSAGE = new ReloadDictionaryMessage();
+    public static final ReloadDictionaryEvent reloadDictionaryEvent = new ReloadDictionaryEvent();
 
     private final ApplicationContext applicationContext;
 
@@ -27,11 +27,10 @@ public class DictionaryReloadService {
 
     @Scheduled(cron = "${service.redis.reload-scheduler.cron}")
     public void reloadDictionaries() {
-        //TODO: переделать на push класса Object вместо Message
-        standardMessagesPrioritizedQueue.pushMessage(0, MESSAGE);
+        standardMessagesPrioritizedQueue.pushMessage(0, reloadDictionaryEvent);
     }
 
-    @EventListener(ReloadDictionaryMessage.class)
+    @EventListener(ReloadDictionaryEvent.class)
     public void reload() {
         final var beansOfType = applicationContext.getBeansOfType(RedisDictionary.class);
         for (final RedisDictionary dictionary : beansOfType.values()) {
