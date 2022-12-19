@@ -21,6 +21,9 @@ public class ConfigurationPropertiesServiceRedis {
     @NestedConfigurationProperty
     private OutcomeCollections outcomeCollections;
 
+    @NestedConfigurationProperty
+    private ReloadScheduler reloadScheduler;
+
     @Getter
     @Setter
     public static class IncomeCollections {
@@ -45,5 +48,12 @@ public class ConfigurationPropertiesServiceRedis {
     @Setter
     public static class StandardUploader {
         private boolean enabled = true;
+    }
+
+    @Getter
+    @Setter
+    public static class ReloadScheduler {
+        private boolean enabled;
+        private String cron;
     }
 }

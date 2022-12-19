@@ -10,7 +10,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import ru.gx.core.channels.*;
 import ru.gx.core.messaging.Message;
 import ru.gx.core.messaging.MessageBody;
-import ru.gx.core.messaging.MessageHeader;
 import ru.gx.core.redis.IncomeCollectionSortMode;
 
 import java.security.InvalidParameterException;

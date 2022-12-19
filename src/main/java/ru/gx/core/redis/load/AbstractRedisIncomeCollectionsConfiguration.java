@@ -1,5 +1,6 @@
 package ru.gx.core.redis.load;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -29,8 +30,12 @@ public abstract class AbstractRedisIncomeCollectionsConfiguration extends Abstra
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialization">
-    protected AbstractRedisIncomeCollectionsConfiguration(@NotNull final String configurationName, @NotNull final RedisConnectionFactory connectionFactory) {
-        super(ChannelDirection.In, configurationName);
+    protected AbstractRedisIncomeCollectionsConfiguration(
+            @NotNull final String configurationName,
+            @NotNull final RedisConnectionFactory connectionFactory,
+            @NotNull final MeterRegistry meterRegistry
+            ) {
+        super(ChannelDirection.In, configurationName, meterRegistry);
         this.connectionFactory = connectionFactory;
         this.jsonStringRedisTemplate = new StringRedisTemplate();
         this.binaryRedisTemplate = new RedisTemplate<>();

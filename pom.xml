@@ -6,7 +6,7 @@
 
     <groupId>ru.gx.core</groupId>
     <artifactId>gx-core-redis-starter</artifactId>
-    <version>1.5.12</version>
+    <version>1.5.23</version>
 
     <properties>
         <encoding>UTF-8</encoding>
@@ -14,7 +14,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven-compiler-plugin.version>3.10.0</maven-compiler-plugin.version>
         <spring-boot-maven-plugin.version>2.7.0</spring-boot-maven-plugin.version>
-        <gx-core-dependencies.version>1.5.12</gx-core-dependencies.version>
+        <gx-core-dependencies.version>1.5.23</gx-core-dependencies.version>
     </properties>
 
     <dependencyManagement>
@@ -49,6 +49,10 @@
         <dependency>
             <groupId>ru.gx.core</groupId>
             <artifactId>gx-core-root-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ru.gx.core</groupId>
+            <artifactId>gx-core-rest-api-starter</artifactId>
         </dependency>
 
         <dependency>

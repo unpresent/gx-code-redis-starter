@@ -1,4 +1,12 @@
 package ru.gx.core.redis.reload;
 
-public class ReloadDictionaryEvent {
+import org.jetbrains.annotations.NotNull;
+import ru.gx.core.longtime.LongtimeProcessEvent;
+
+import java.util.UUID;
+
+public class ReloadDictionaryEvent extends LongtimeProcessEvent {
+    public ReloadDictionaryEvent(@NotNull UUID longtimeProcessId) {
+        super(longtimeProcessId);
+    }
 }

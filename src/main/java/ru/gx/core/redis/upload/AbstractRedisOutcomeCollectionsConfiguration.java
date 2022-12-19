@@ -1,5 +1,6 @@
 package ru.gx.core.redis.upload;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -25,11 +26,16 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
     @Getter(PROTECTED)
     @NotNull
     private final RedisConnectionFactory connectionFactory;
+
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Initialization">
-    protected AbstractRedisOutcomeCollectionsConfiguration(@NotNull final String configurationName, @NotNull RedisConnectionFactory connectionFactory) {
-        super(ChannelDirection.Out, configurationName);
+    protected AbstractRedisOutcomeCollectionsConfiguration(
+            @NotNull final String configurationName,
+            @NotNull final RedisConnectionFactory connectionFactory,
+            @NotNull final MeterRegistry meterRegistry
+    ) {
+        super(ChannelDirection.Out, configurationName, meterRegistry);
         this.connectionFactory = connectionFactory;
         this.jsonStringRedisTemplate = new StringRedisTemplate();
         this.binaryRedisTemplate = new RedisTemplate<>();
@@ -39,6 +45,7 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
     protected RedisOutcomeCollectionUploadingDescriptorsDefaults createChannelDescriptorsDefaults() {
         return new RedisOutcomeCollectionUploadingDescriptorsDefaults();
     }
+
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Реализация OutcomeCollectionsConfiguration">
@@ -50,7 +57,7 @@ public abstract class AbstractRedisOutcomeCollectionsConfiguration extends Abstr
 
     @Override
     public @NotNull RedisOutcomeCollectionUploadingDescriptorsDefaults getDescriptorsDefaults() {
-        return (RedisOutcomeCollectionUploadingDescriptorsDefaults)super.getDescriptorsDefaults();
+        return (RedisOutcomeCollectionUploadingDescriptorsDefaults) super.getDescriptorsDefaults();
     }
 
     @Override

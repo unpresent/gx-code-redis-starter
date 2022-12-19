@@ -3,13 +3,13 @@ package ru.gx.core.redis.load;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import ru.gx.core.channels.ChannelConfigurationException;
-import ru.gx.core.channels.ChannelHandlerDescriptor;
 import ru.gx.core.channels.IncomeDataProcessType;
 import ru.gx.core.channels.SerializeMode;
 import ru.gx.core.messaging.Message;
@@ -29,6 +29,7 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @SuppressWarnings({"unused", "ClassCanBeRecord"})
 @Slf4j
+@RequiredArgsConstructor
 public class RedisIncomeCollectionsLoader {
     private final static int MAX_SLEEP_MS = 64;
 
@@ -55,19 +56,6 @@ public class RedisIncomeCollectionsLoader {
     @Getter(PROTECTED)
     @NotNull
     private final MessagesPrioritizedQueue eventsQueue;
-
-    // </editor-fold>
-    // -------------------------------------------------------------------------------------------------------------
-    // <editor-fold desc="Initialization">
-    public RedisIncomeCollectionsLoader(
-            @NotNull final ApplicationEventPublisher eventPublisher,
-            @NotNull final ObjectMapper objectMapper,
-            @NotNull final MessagesPrioritizedQueue eventsQueue
-    ) {
-        this.eventPublisher = eventPublisher;
-        this.objectMapper = objectMapper;
-        this.eventsQueue = eventsQueue;
-    }
     // </editor-fold>
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="реализация IncomeCollectionsLoader">
