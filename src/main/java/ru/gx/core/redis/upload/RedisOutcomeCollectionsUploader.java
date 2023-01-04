@@ -21,6 +21,7 @@ import ru.gx.core.messaging.MessagesFactory;
 import ru.gx.core.redis.load.PublishSnapshotContext;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -28,6 +29,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Slf4j
 @RequiredArgsConstructor
 public class RedisOutcomeCollectionsUploader {
+    public static final int TEMP_SET_EXPIRE_HOURS = 3;
     // -------------------------------------------------------------------------------------------------------------
     // <editor-fold desc="Fields">
 
@@ -302,6 +304,7 @@ public class RedisOutcomeCollectionsUploader {
                             tempSetName,
                             messages.keySet().toArray(new String[messages.keySet().size()])
                     );
+            this.stringRedisTemplate.expire(tempSetName, TEMP_SET_EXPIRE_HOURS, TimeUnit.HOURS);
         }
 
         template.opsForHash()
@@ -325,10 +328,8 @@ public class RedisOutcomeCollectionsUploader {
                     }
                 }
             }
-            //удаляем временное множество ключей
-            final var tempSetDeleted = stringRedisTemplate.delete(tempSetName);
-            log.info("Deletion finished for context: {}, tempSet: {}, tempSetDeleted: {}, deletedEntries: {}", context,
-                    tempSetName, tempSetDeleted, deletedEntries);
+            log.info("Deletion finished for context: {}, tempSet: {}, deletedEntries: {}", context,
+                    tempSetName, deletedEntries);
         }
     }
 
